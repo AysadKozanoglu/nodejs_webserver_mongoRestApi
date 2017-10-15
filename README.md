@@ -1,15 +1,21 @@
 # nodejs_webserver_mongoRestApi by Aysad Kozanoglu
 
 requirements:
-npm install simple-node-logger colors express node-uuid mongodb
+<pre>
+npm install colors express node-uuid mongodb simple-node-logger sleep-ms 
+</pre>
 
-node httpApiRest.js
 
-then open your browser: http://localhost:8084
+start server:
+<pre>
+node httpApiRest.js 8080
+</pre>
+
+then open your browser: http://localhost:8080
 
 The MIT License (MIT)
 
-Copyright (c) <206> <copyright Aysad Kozanoglu>
+Copyright (c) <2016> <copyright Aysad Kozanoglu>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 

@@ -1,18 +1,26 @@
+//
+// Author: Aysad Kozanoglu
+// email: aysadx@gmail.com
+// web: http://aysad.pe.hu
+// use the syslog_json_piper.sh as connector to log management
+
 //process.env.NODE_ENV = 'production';
 
-var log = require('simple-node-logger').createSimpleLogger('log-httpApirest.log');
-log.setLevel('info');
-var colors = require('colors');
-var express = require('express');
-var app = express();
-var nodeUuid = require('node-uuid');
-var port = 8084;
-var queryLimit =20;
-var mongodb = require('mongodb');
+var log 	= require('simple-node-logger').createSimpleLogger('log-httpApirest.log');
+var base64      = require('js-base64').Base64;
+var colors 	= require('colors');
+var express 	= require('express');
+var sleepms 	= require('sleep-ms');
+var app 	= express();
+var nodeUuid 	= require('node-uuid');
+var port 	= 8084;
+var queryLimit 	= 20;
+var mongodb 	= require('mongodb');
 var MongoClient = require('mongodb').MongoClient;
-var db;
+var dbname 	= "logs";
+var mode 	= process.env;
 
-var mode = process.env;
+log.setLevel('info');
 
 // print process.argv
 //process.argv.forEach(function (val, index, array) {
@@ -24,6 +32,9 @@ var args = process.argv.slice(2);
 if (args[0])
 	port = args[0];
 
+if (args[1])
+	database= args[1];
+
 function logger(txt){
 //  console.log(txt);
     log.info(txt);
@@ -32,13 +43,13 @@ function logger(txt){
 logger(mode.NODE_ENV);
 
 // Initialize connection once
-MongoClient.connect("mongodb://localhost:27017/testdb", function(err, database) {
+MongoClient.connect("mongodb://localhost:27017/"+dbname, function(err, database) {
   if(err) throw err;
 
   db = database;
   // Start the application after the database connection is ready
   app.listen(port);
-  logger("Listening on port "+port);
+  logger("Listening on port "+port+" db:"+dbname );
 });
 
 app.get('/', function (req, res) {
@@ -48,18 +59,19 @@ app.get('/', function (req, res) {
 
 })
 
-app.get('/cihazlar', function(req, res) {
+app.get('/get', function(req, res) {
 	res.set({ 'content-type': 'application/json; charset=utf-8' });
-    var collection = db.collection('users');
-    collection.distinct('device', function(err, docs) {
+    var collection = db.collection('hosts');
+    	// collection.distinct('host', function(err, docs) {
+	collection.find({}).limit(queryLimit).sort({_id:-1}).toArray(function(err, docs) {
         res.json(docs);
 //		db.close();
     });
 })
 
-app.get('/goster/say', function(req, res) {
+app.get('/count', function(req, res) {
 	res.set({ 'content-type': 'application/json; charset=utf-8' });
-    var collection = db.collection('users');
+    var collection = db.collection('hosts');
     collection.count().then(function(count) {
         res.json(count);
 //		db.close();
@@ -71,44 +83,45 @@ function logger(txt){
 	log.info(txt);
 }
 
-app.get('/goster/:device', function (req, res) {
-	//  http://...goster/htc
+app.get('/get/:host', function (req, res) {
+	host = req.params.host;
 	res.set({ 'content-type': 'application/json; charset=utf-8' });
-	var dev = req.params.device || "htc";
-    var collection = db.collection('users');
-    collection.find({"device":dev}).limit(queryLimit).sort({_id:-1}).toArray(function(err, 
+    	var collection = db.collection('hosts');
+    collection.find( { "host" : { $regex : host } }).limit(queryLimit).sort({_id:-1}).toArray(function(err, 
 docs){
         res.send(docs);
 //		db.close();
     });
-	logger(dev);
+	logger(host);
 })
 
 
-var lati,long,dev,uuid;
-app.get('/api/:long/:lati/:device/:uuid/:adress', function(req, res) {
+var jsonValue;
+var toInsert;
+app.get('/add/:Value', function(req, res) {
 
-    lati = req.params.lati;
-    long = req.params.long;
-    dev = req.params.device;
-    uuid = req.params.uuid;
-	adress = req.params.adress;
-    device = req.params.device;
+    jsonValue 	= base64.decode(req.params.Value);
+    jsonValue 	= JSON.parse(jsonValue); 
+    uuid 	= req.params.uuid;
+    host 	= jsonValue.host;
+    message	= jsonValue.mess;
+    timestamp	= Date.now();
+    date	= jsonValue.date;
+
     res.set({ 'content-type': 'application/json; charset=utf-8' });
 
-	if(lati && long && dev && uuid){
-		var collection = db.collection('users');
-		var toInsert = {
-						'long':long,'lat':lati,'device':dev,'uuid':uuid,
-						'NodeID':nodeUuid.v4(),'adress':adress
-						};
+	if(jsonValue){
+		var collection = db.collection('hosts');
+		var toInsert = {'host':host,'date':date,'dbtimestamp':timestamp,'message':message};
+		//var toInsert = jsonValue;
 		collection.insert(toInsert, {w:1}).then(function(count) {
 			res.json({"status":"true"})
 //			db.close();
 		});
-		toLog = long +" "+ lati +" "+uuid+" "+colors.yellow(dev)+" "+adress;
+		toLog = colors.yellow(jsonValue.host);
 		logger(toLog);
 	}
+sleepms(300);
 })
 
 
