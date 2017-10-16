@@ -25,7 +25,7 @@ to pipe syslog or kern log json formatted to server use the syslog_json_piper.sh
 
 ./syslog_json_piper.sh logServerhost:port  pathToLogFile
 <pre>
-./syslog_json_piper.sh 127.0.0.1:8084 /var/log/kern.log
+./syslog_json_piper.sh 127.0.0.1:8080 /var/log/kern.log
 </pre>
 
 
