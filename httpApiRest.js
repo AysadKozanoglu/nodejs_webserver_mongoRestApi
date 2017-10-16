@@ -6,19 +6,20 @@
 
 //process.env.NODE_ENV = 'production';
 
-var log 	= require('simple-node-logger').createSimpleLogger('log-httpApirest.log');
+var log 	      = require('simple-node-logger').createSimpleLogger('log-httpApirest.log');
 var base64      = require('js-base64').Base64;
-var colors 	= require('colors');
-var express 	= require('express');
-var sleepms 	= require('sleep-ms');
-var app 	= express();
-var nodeUuid 	= require('node-uuid');
-var port 	= 8084;
+var colors 	    = require('colors');
+var express     = require('express');
+var sleepms 	  = require('sleep-ms');
+var app 	      = express();
+var nodeUuid 	  = require('node-uuid');
+var port 	      = 8084;
 var queryLimit 	= 20;
-var mongodb 	= require('mongodb');
+var mongodb 	  = require('mongodb');
 var MongoClient = require('mongodb').MongoClient;
-var dbname 	= "logs";
-var mode 	= process.env;
+var ObjectId    = require('mongodb').ObjectID;
+var dbname 	    = "logs";
+var mode 	      = process.env;
 
 log.setLevel('info');
 
@@ -26,8 +27,8 @@ log.setLevel('info');
 //process.argv.forEach(function (val, index, array) {
 //  console.log(index + ': ' + val);
 //});
-
 var args = process.argv.slice(2);
+
 //console.log(args[0]);
 if (args[0])
 	port = args[0];
@@ -68,6 +69,19 @@ app.get('/get', function(req, res) {
 //		db.close();
     });
 })
+
+
+app.get('/getid/:id', function (req, res) {
+  id = req.params.id;
+  res.set({ 'content-type': 'application/json; charset=utf-8' });
+  var collection = db.collection('hosts');
+      // collection.distinct('host', function(err, docs)
+    collection.findOne({"_id": new ObjectId(id)}, function(err, docs) {
+        res.json(docs);
+//    db.close();
+    });  
+})
+
 
 app.get('/count', function(req, res) {
 	res.set({ 'content-type': 'application/json; charset=utf-8' });

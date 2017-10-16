@@ -11,7 +11,37 @@ start server:
 node httpApiRest.js 8080
 </pre>
 
-then open your browser: http://localhost:8080
+###to get all records
+http://localhost:8080/get
+
+### full text search records
+http://localhost:8080/get/STRING
+
+### search / get by id
+http://localhost:8080/getid/objectID
+
+###syslog / kernlog json wrapper 
+to pipe syslog or kern log json formatted to server use the syslog_json_piper.sh
+
+./syslog_json_piper.sh logServerhost:port  pathToLogFile
+<pre>
+./syslog_json_piper.sh 127.0.0.1:8084 /var/log/kern.log
+</pre>
+
+
+syslog_json_piper client wrapper requirements
+<pre>
+apt-get intsall autoreconf --yes
+cd jo && autoreconf -i
+chmod +x configure
+./configure
+make check
+make install
+git clone https://github.com/jpmens/jo
+</pre>
+
+
+
 
 The MIT License (MIT)
 
