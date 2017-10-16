@@ -83,16 +83,23 @@ function logger(txt){
 	log.info(txt);
 }
 
-app.get('/get/:host', function (req, res) {
-	host = req.params.host;
+app.get('/get/:searchStr', function (req, res) {
+	searchStr = req.params.searchStr;
 	res.set({ 'content-type': 'application/json; charset=utf-8' });
     	var collection = db.collection('hosts');
-    collection.find( { "host" : { $regex : host } }).limit(queryLimit).sort({_id:-1}).toArray(function(err, 
-docs){
-        res.send(docs);
+//    collection.find( { "host" : { $regex : searchStr } }).limit(queryLimit).sort({_id:-1}).toArray(function(err, docs){
+//       res.send(docs);
 //		db.close();
-    });
-	logger(host);
+//    });
+
+collection.find( { $text : {$search : searchStr}  } , 
+                {score : { $meta: "textScore" } })
+                .sort( { score: { $meta: "textScore" } } )
+                .toArray(function(err, docs){
+                    res.send(docs);
+                //    db.close();
+                });
+	logger(searchStr);
 })
 
 
