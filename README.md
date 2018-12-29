@@ -1,6 +1,7 @@
 # nodejs_webserver_mongoRestApi by Aysad Kozanoglu
 
 requirements:
+installed mongoDB Server 
 
 ```
 npm install colors express node-uuid mongodb simple-node-logger sleep-ms 
