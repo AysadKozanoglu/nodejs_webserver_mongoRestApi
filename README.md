@@ -1,16 +1,19 @@
 # nodejs_webserver_mongoRestApi by Aysad Kozanoglu
 
 requirements:
-<pre>
+
+```
 npm install colors express node-uuid mongodb simple-node-logger sleep-ms 
-</pre>
+
+```
 
 
 start server:
-<pre>
-node httpApiRest.js 8080
-</pre>
 
+```
+node httpApiRest.js 8080
+
+```
 ## to get all records
 http://localhost:8080/get
 
@@ -22,15 +25,21 @@ http://localhost:8080/getid/objectID
 
 ## syslog / kernlog json wrapper 
 to pipe syslog or kern log json formatted to server use the syslog_json_piper.sh
-
+```
 ./syslog_json_piper.sh logServerhost:port  pathToLogFile
-<pre>
+
+```
+
+
+```
 ./syslog_json_piper.sh 127.0.0.1:8080 /var/log/kern.log
-</pre>
+
+```
 
 
-syslog_json_piper client wrapper requirements
-<pre>
+##### syslog_json_piper client wrapper requirements
+
+```
 apt-get intsall autoreconf --yes
 cd jo && autoreconf -i (or autoconf2.13)
 
@@ -39,7 +48,8 @@ chmod +x configure
 make check
 make install
 git clone https://github.com/jpmens/jo
-</pre>
+
+```
 
 
 
